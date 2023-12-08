@@ -1,0 +1,44 @@
+<body style="margin:0;padding:0;background-color: black;color:white;">
+    <canvas id="cvs" width="512" height="512" style="background-color: white;"></canvas>
+    <input id="username" value="Kevin">
+    <input id="colorInput" type="color" value="purple">
+    <div id="output">0</div>
+</body>
+<script>
+    let lastX = undefined;
+    let lastY = undefined;
+    let history = [];
+
+    //REDRAW
+    if(localStorage.getItem("history") !== null){
+        history = JSON.parse(localStorage.history);
+        history.forEach(e=>{
+            //DRAW A LINE
+            const ctx = cvs.getContext("2d");
+            ctx.beginPath(); // Start a new path
+            ctx.strokeStyle = e.color ? e.color : "red";
+            ctx.moveTo(e.x0, e.y0); // Move the pen
+            ctx.lineTo(e.x, e.y); // Draw a line 
+            ctx.stroke(); // Render the path
+        })
+    }
+    cvs.addEventListener("mousemove", e => {
+        if (lastX != undefined && lastY != undefined && e.buttons > 0) {
+            const color = colorInput.value;
+            console.log(color);
+            history.push({ x: e.clientX, y: e.clientY, x0: lastX, y0: lastY, who:username.value, color: color });
+            localStorage.history = JSON.stringify(history);
+            output.innerHTML = localStorage.history.length;
+            //DRAW A LINE
+            const ctx = cvs.getContext("2d");
+            ctx.beginPath(); // Start a new path
+            ctx.moveTo(lastX, lastY); // Move the pen
+            ctx.strokeStyle = color;
+            ctx.lineTo(e.clientX, e.clientY); // Draw a line 
+            ctx.stroke(); // Render the path
+        }
+        lastX = e.clientX;
+        lastY = e.clientY;
+        
+    });
+</script>
